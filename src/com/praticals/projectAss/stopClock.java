@@ -16,7 +16,7 @@ public class stopClock extends Game{
         //generate random half seconds
         Random rand = new Random();
         double targetTime = 3 + rand.nextInt(10) * 0.5;
-        System.out.printf("Stop time on %.2f exactly.%n", targetTime);
+        System.out.printf("To win, stop time on %.2f exactly.%n", targetTime);
 
 
         //only start on enter without other key stock
@@ -29,15 +29,14 @@ public class stopClock extends Game{
         System.out.println("... Time on ...");
         System.out.println("(Hit enter again to stop the clock.)");
         long startTime = System.currentTimeMillis();
-        String endSignal = scanSysIn.nextLine(); // useless variable, only to detect enter stoke
+        scanSysIn.nextLine(); // useless variable, only to detect enter stoke
         long endTime = System.currentTimeMillis();
         double timeElapsed = (endTime - startTime)/1000.0; // time in millisecond
 
-        double gap = timeElapsed - targetTime;
-        if (gap < -100 || gap > 100){   //debug
+        double tolerance = timeElapsed - targetTime;
+        if (tolerance < - 0.15 || tolerance > 0.15){
             System.out.printf("You failed. Your time is %.2f s. %n", timeElapsed);
         }else{
-            System.out.println("You win!");
             // add bet points to player's account
             currentPlayer.winGame();
         }

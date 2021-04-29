@@ -1,62 +1,47 @@
 package com.praticals.projectAss;
 
+import java.io.Serializable;
 import java.util.Scanner;
 
-public class User implements Comparable <User>{
-    private int id;
+public class User implements Comparable <User>, Serializable {
     private String name;
-    private Game playingGame;
     private int score;
     private int bet; //bet on different game
-    private boolean is_vip = false;
-    private int betTimes = 1;
 
-    User(String name, boolean is_vip){
+    User(String name){
         this.name = name;
-        if(is_vip){
-            this.is_vip = true;
-            score = 10; // give extra points for vip users
-            betTimes = 2; //VIP can bet on twice of their score
-        }
     }
 
-
-    public int getId() { return id; }
     public String getName() { return name; }
-    public Game getPlayingGame() { return playingGame; }
     public int getScore() {
         return score;
     }
     public int getBet() {
         return bet;
     }
-    public int getBetTimes(){return betTimes;}
 
     public void setName(String name) { this.name = name; }
-    public void setPlayingGame(Game playingGame) { this.playingGame = playingGame; }
+    public void setScore(int score) {
+        this.score = score;
+    }
 
     @Override
     public String toString() {
         return "User" + name +
-                ": id is " + id +
-                ", is playing Game " + playingGame.toString() + '.';
+                ", has score " + score + '.';
     }
 
 
     public int compareTo(User ur) {
         return Integer.compare(score, ur.getScore());
-//        if (score > ur.getScore()){
-//            return 1;
-//        }else if (score == ur.getScore()){
-//            return 0;
-//        }else {return -1;}
     }
 
     public void winGame(){
+        System.out.println("Well done. You win!");
         this.score += bet;
     }
 
-    public void setBet(Scanner scanSysIn) {
+    public void setBet(Scanner scanSysIn, Game playingGame) {
         System.out.printf("You have %d points.%n",score);
         if (score == 0) {
             // auto set bet to game default points if user got no point
@@ -74,25 +59,23 @@ public class User implements Comparable <User>{
                 }
                 wannaBet = scanSysIn.nextInt();
 
+                // non negative and VIP can bet on multiple times of their score
                 if(wannaBet >= 0 && wannaBet <= this.getScore()){
                     break;
                 }else {
                     // print error message
                     System.out.println(
-                            wannaBet < 0 ? "Cannot bet on negatives." :
-                                    wannaBet > this.getScore()*this.getBetTimes() ?
-                                            "You don't have enough points to bet." : ""
-                    );
+                        wannaBet < 0 ? "Cannot bet on negatives." :
+                            wannaBet > this.getScore() ?
+                                "You don't have enough points to bet." : "");
                 }
             }
-            bet = wannaBet == 0 ? this.playingGame.getDefaultScore(): wannaBet; //set bet points
-//            scan.close();
+            bet = wannaBet == 0 ? playingGame.getDefaultScore(): wannaBet; //set bet points
         }
         System.out.printf("Bet %d points on this round. %n", bet);
     }
 
     public void greet(){
-        System.out.printf("Hello, %s%s. Please choose a game to start.%n", name,
-                (is_vip ? " the VIP":""));
+        System.out.printf("Hello, %s. Please choose a game to start. %n", this.getName());
     }
 }

@@ -20,7 +20,6 @@ public class biGuess extends Game{
         int round = 0;
 
         System.out.printf("Secret in range 0 to %d. Guess it with in %d rounds.%n", top, roundLimit);
-        System.out.println(target);
 
         while (round < roundLimit){
             System.out.printf("This is %d guess, you have %d guess left. %n " +
@@ -32,9 +31,8 @@ public class biGuess extends Game{
                 int guessInt = scanSysIn.nextInt();
                 round ++;
                 if(guessInt==target){
-                    System.out.println("Your are right! Secret number is "+target+" .");
                     currentPlayer.winGame();
-                    return;
+                    break;
                 }else if (guessInt > target){
                     System.out.println("Wrong answer. Try smaller guess.");
                 }else {
@@ -43,7 +41,7 @@ public class biGuess extends Game{
             }
         }
 
-        System.out.println("Run out of guesses. You failed.");
-        System.out.println("The secret number is "+target+".");
+        System.out.printf((round==roundLimit ? "Run out of guesses. You failed." : "")
+                +"The secret number is %s . %n", target);
     }
 }

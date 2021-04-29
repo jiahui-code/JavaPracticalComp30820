@@ -1,7 +1,7 @@
 package com.praticals.projectAss;
 
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -16,7 +16,20 @@ public class mainMenu {
         allGames[0] = new stopClock();
         allGames[1] = new biGuess();
         String gamePanelSeparator = "*".repeat(30);
-        String promoteCode = "w";
+        String promoteCode = "promote";
+
+        // read player list from file, parse it to player Arraylist
+        try{
+            FileInputStream fis = new FileInputStream("players.txt");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            players = (ArrayList<User>) ois.readObject();
+            ois.close();
+        }catch (IOException e){
+            e.printStackTrace();
+            System.out.println("No historical player file found.");
+        }catch (ClassNotFoundException c){
+            c.printStackTrace();
+        }
 
         while (true) {
             System.out.println("-----Welcome to GAMING BOARD-----");
@@ -33,7 +46,13 @@ public class mainMenu {
                 boolean promoted = scan.nextLine().equals(promoteCode);
                 System.out.println((promoted ? "Valid " : "Invalid") + "promote code usage.");
 
-                User playerNow = new User(newName, promoted);
+                // if given correct promote code, create as VIP
+                User playerNow;
+                if (promoted){
+                    playerNow = new vipUser(newName);
+                } else {
+                    playerNow = new User(newName);
+                }
                 players.add(playerNow);
                 playerNow.greet();
                 System.out.println(gamePanelSeparator);
@@ -63,9 +82,9 @@ public class mainMenu {
                         break;
                     } else { // if user choose a game, let the game play
                         Game playingGame = allGames[selectGameInt - 1]; //one more for user integer
-                        playerNow.setPlayingGame(playingGame);
                         // prompt user to set a bet or to user default game points
-                        playerNow.setBet(scan);
+                        playerNow.setBet(scan, playingGame);
+                        scan.nextLine();
                         playingGame.describeGame();
                         playingGame.GameOn(playerNow, scan);
                     }
@@ -74,6 +93,17 @@ public class mainMenu {
                 System.out.println("****Ranking for all players****");
                 scan.close();
                 displayUsersRank(players);
+                System.out.println("-----See you next time-----");
+
+                // write player list to file
+                try {
+                    FileOutputStream fos = new FileOutputStream("players.txt");
+                    ObjectOutputStream oos = new ObjectOutputStream(fos);
+                    oos.writeObject(players);
+                    oos.close();
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
                 break;
             }
         }
@@ -92,13 +122,13 @@ public class mainMenu {
     public static boolean enterBoard(Scanner fScan){
         // main board function for return boolean if user chosen to enter game panel
         while (true){
-            System.out.println("Hit enter to start as new user, or 'quit' to end game: ");
+            System.out.println("Hit enter to start as new user, or 'q' to end game: ");
             String userChosen = fScan.nextLine();
             if (userChosen.isEmpty()){
                 return true;
             }
-            if (userChosen.equals("quit")){
-                System.out.println("You have chosen to quit.");
+            if (userChosen.equals("q")){
+                System.out.println("-----Exiting GAMING BOARD-----");
                 return false;
             }
         }
